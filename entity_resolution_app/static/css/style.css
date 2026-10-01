@@ -1,0 +1,64 @@
+body {
+    background: #f7f9fc;
+    color: #1f2937;
+    font-family: Arial, sans-serif;
+}
+
+.hero-box {
+    background: linear-gradient(135deg, #eef6ff 0%, #dfeafe 100%);
+    border: 1px solid #d8e8ff;
+}
+
+.stat-card {
+    border: 1px solid #dfe8f5;
+    border-radius: 12px;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.07);
+}
+
+.stat-label {
+    color: #667085;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.stat-number {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-top: 0.5rem;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+}
+
+.status-badge.high_confidence {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.status-badge.possible_match {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.status-badge.no_match {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.manual-review-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 16px;
+    background: white;
+}
+
+table th, table td {
+    vertical-align: middle;
+}

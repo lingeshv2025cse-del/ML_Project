@@ -1,0 +1,5 @@
+MATCH_THRESHOLD = 0.60
+HIGH_CONFIDENCE_THRESHOLD = 0.85
+TOP_K_CANDIDATES = 20
+
+APP_TITLE = "Multi-Source Business Entity Resolution"

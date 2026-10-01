@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <script src="https://cdn.plot.ly/plotly-2.30.0.min.js"></script>
+</head>
+<body>
+    <div class="container py-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Analytics Dashboard</h2>
+            <a class="btn btn-primary" href="/results">Back to Results</a>
+        </div>
+
+        <div class="row g-3 mb-4">
+            <div class="col-md-3">
+                <div class="card stat-card">
+                    <div class="card-body">
+                        <div class="stat-label">Source 1 Records</div>
+                        <div class="stat-number">{{ analytics.source1_records if analytics else 0 }}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card stat-card">
+                    <div class="card-body">
+                        <div class="stat-label">Source 2 Records</div>
+                        <div class="stat-number">{{ analytics.source2_records if analytics else 0 }}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card stat-card">
+                    <div class="card-body">
+                        <div class="stat-label">Source 3 Records</div>
+                        <div class="stat-number">{{ analytics.source3_records if analytics else 0 }}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card stat-card">
+                    <div class="card-body">
+                        <div class="stat-label">High Confidence</div>
+                        <div class="stat-number">{{ analytics.high_confidence if analytics else 0 }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-6">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <h5>Match Status Distribution</h5>
+                        <div id="matchStatusChart"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <h5>Average Field Similarity</h5>
+                        <div id="similarityChart"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-4">
+            <h4>Model Evaluation</h4>
+            {% if analytics.metrics %}
+                <div class="alert alert-warning">This evaluation is based on automatically generated weak labels unless a genuine match label column is present.</div>
+                <div class="card">
+                    <div class="card-body">
+                        <p><strong>Accuracy:</strong> {{ analytics.metrics.accuracy if analytics.metrics.accuracy is defined else 'N/A' }}</p>
+                        <p><strong>Precision:</strong> {{ analytics.metrics.precision if analytics.metrics.precision is defined else 'N/A' }}</p>
+                        <p><strong>Recall:</strong> {{ analytics.metrics.recall if analytics.metrics.recall is defined else 'N/A' }}</p>
+                        <p><strong>F1-Score:</strong> {{ analytics.metrics.f1_score if analytics.metrics.f1_score is defined else 'N/A' }}</p>
+                        <p><strong>ROC-AUC:</strong> {{ analytics.metrics.roc_auc if analytics.metrics.roc_auc is defined else 'N/A' }}</p>
+                    </div>
+                </div>
+            {% else %}
+                <div class="alert alert-info">No labelled evaluation dataset was detected. The model is trained using weak labels.</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        const statusData = {
+            labels: ['HIGH_CONFIDENCE', 'POSSIBLE_MATCH', 'NO_MATCH'],
+            values: [
+                {{ analytics.high_confidence if analytics else 0 }},
+                {{ analytics.possible_matches if analytics else 0 }},
+                {{ analytics.unmatched if analytics else 0 }}
+            ]
+        };
+
+        const similarityData = {
+            labels: ['Name', 'Address', 'Phone', 'Email'],
+            values: [
+                {{ analytics.match_stats.avg_name_similarity if analytics and analytics.match_stats else 0 }},
+                {{ analytics.similarity_stats.avg_address_similarity if analytics and analytics.similarity_stats else 0 }},
+                {{ analytics.similarity_stats.avg_phone_similarity if analytics and analytics.similarity_stats else 0 }},
+                {{ analytics.similarity_stats.avg_email_similarity if analytics and analytics.similarity_stats else 0 }}
+            ]
+        };
+
+        Plotly.newPlot('matchStatusChart', [{
+            type: 'pie',
+            labels: statusData.labels,
+            values: statusData.values,
+            hole: 0.35,
+            textinfo: 'label+percent'
+        }], {
+            margin: { t: 20, b: 10 },
+            paper_bgcolor: 'white'
+        });
+
+        Plotly.newPlot('similarityChart', [{
+            type: 'bar',
+            x: similarityData.labels,
+            y: similarityData.values,
+            marker: { color: ['#4e73df', '#1cc88a', '#36b9cc', '#f6c23e'] }
+        }], {
+            margin: { t: 20, b: 40 },
+            paper_bgcolor: 'white',
+            yaxis: { range: [0, 1] }
+        });
+    </script>
+</body>
+</html>

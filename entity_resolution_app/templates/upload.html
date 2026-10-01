@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Datasets</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card shadow-sm">
+                    <div class="card-body p-4">
+                        <h2 class="mb-4">Upload Source CSV Files</h2>
+
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                            {% if messages %}
+                                {% for category, message in messages %}
+                                    <div class="alert alert-{{ 'danger' if category == 'error' else 'success' }}">{{ message }}</div>
+                                {% endfor %}
+                            {% endif %}
+                        {% endwith %}
+
+                        <form method="POST" enctype="multipart/form-data" id="uploadForm">
+                            <div class="mb-3">
+                                <label class="form-label">Source 1 CSV</label>
+                                <input type="file" class="form-control" name="source1_file" accept=".csv" onchange="showFileName(this, 'source1-name')">
+                                <small id="source1-name" class="text-muted">No file selected</small>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Source 2 CSV</label>
+                                <input type="file" class="form-control" name="source2_file" accept=".csv" onchange="showFileName(this, 'source2-name')">
+                                <small id="source2-name" class="text-muted">No file selected</small>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Source 3 CSV</label>
+                                <input type="file" class="form-control" name="source3_file" accept=".csv" onchange="showFileName(this, 'source3-name')">
+                                <small id="source3-name" class="text-muted">No file selected</small>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary">Start Entity Resolution</button>
+                            <a class="btn btn-secondary ms-2" href="/">Back to Home</a>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

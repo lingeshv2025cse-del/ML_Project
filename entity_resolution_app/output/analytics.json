@@ -1,0 +1,25 @@
+{
+  "has_label": false,
+  "label_source": "weak_labels_generated",
+  "training_notes": "No candidate pairs were generated for the provided datasets.",
+  "metrics": {
+    "label_type": "no_candidates",
+    "n_candidates": 0
+  },
+  "records": {
+    "source1": 2,
+    "source2": 2,
+    "source3": 2
+  },
+  "match_stats": {
+    "high_confidence": 0,
+    "possible": 0,
+    "unmatched": 2
+  },
+  "similarity_stats": {
+    "avg_name_similarity": 0.0,
+    "avg_address_similarity": 0.0,
+    "avg_phone_similarity": 0.0,
+    "avg_email_similarity": 0.0
+  }
+}

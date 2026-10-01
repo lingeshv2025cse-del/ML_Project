@@ -1,0 +1,1 @@
+"""Entity resolution application package."""

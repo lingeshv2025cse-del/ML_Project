@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Results Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container py-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Results Dashboard</h2>
+            <div>
+                <a class="btn btn-outline-primary" href="/upload">Upload New Data</a>
+                <a class="btn btn-success ms-2" href="/download-results">Download CSV</a>
+                <a class="btn btn-secondary ms-2" href="/analytics">Analytics</a>
+            </div>
+        </div>
+
+        {% if summary.training_note %}
+            <div class="alert alert-info">{{ summary.training_note }}</div>
+        {% endif %}
+
+        <div class="row g-3 mb-4">
+            <div class="col-md-3">
+                <div class="card stat-card">
+                    <div class="card-body">
+                        <div class="stat-label">Total Source 1 Records</div>
+                        <div class="stat-number">{{ summary.records.source1 if summary.records else 0 }}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card stat-card">
+                    <div class="card-body">
+                        <div class="stat-label">Total Source 2 Records</div>
+                        <div class="stat-number">{{ summary.records.source2 if summary.records else 0 }}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card stat-card">
+                    <div class="card-body">
+                        <div class="stat-label">Total Source 3 Records</div>
+                        <div class="stat-number">{{ summary.records.source3 if summary.records else 0 }}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card stat-card">
+                    <div class="card-body">
+                        <div class="stat-label">Total Unmatched</div>
+                        <div class="stat-number">{{ summary.metrics.get('unmatched', 0) if summary.metrics else 0 }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% if summary.results is defined and summary.results.empty == false %}
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <input id="searchInput" type="text" class="form-control" placeholder="Search source1, source2, status...">
+                </div>
+                <div class="col-md-3">
+                    <select id="statusFilter" class="form-select">
+                        <option value="">All statuses</option>
+                        <option value="HIGH_CONFIDENCE">HIGH_CONFIDENCE</option>
+                        <option value="POSSIBLE_MATCH">POSSIBLE_MATCH</option>
+                        <option value="NO_MATCH">NO_MATCH</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <div class="d-flex gap-2">
+                        <button id="prevPage" class="btn btn-outline-secondary">Previous</button>
+                        <button id="nextPage" class="btn btn-outline-secondary">Next</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered align-middle" id="resultsTable">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Source 1</th>
+                            <th>Source 2</th>
+                            <th>Source 3</th>
+                            <th>Match Probability</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for _, row in summary.results.iterrows() %}
+                            <tr data-status="{{ row.match_status }}">
+                                <td>{{ row.source1_name or row.source1_id }}</td>
+                                <td>{{ row.source2_name or row.source2_id }}</td>
+                                <td>{{ row.source3_name or row.source3_id }}</td>
+                                <td>{{ '%.4f'|format(row.overall_probability|float) }}</td>
+                                <td>
+                                    <span class="status-badge {{ row.match_status.lower() }}">{{ row.match_status }}</span>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="alert alert-warning">No results are available yet. Upload a dataset or run the sample pipeline.</div>
+        {% endif %}
+
+        {% if summary.manual_review %}
+            <div class="mt-5">
+                <h3>Manual Review</h3>
+                <form method="POST" action="/manual-review">
+                    {% for _, row in summary.results.iterrows() %}
+                        <div class="manual-review-card mb-3">
+                            <p><strong>{{ row.source1_name }}</strong> vs <strong>{{ row.source2_name or row.source3_name }}</strong></p>
+                            <p>Probability: {{ '%.4f'|format(row.overall_probability|float) }} | Status: {{ row.match_status }}</p>
+                            <input type="hidden" name="candidate_id" value="{{ row.source1_id }}-{{ row.source2_id }}-{{ row.source3_id }}">
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-success" type="submit" name="decision" value="confirm">Confirm Match</button>
+                                <button class="btn btn-outline-danger" type="submit" name="decision" value="reject">Reject Match</button>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </form>
+            </div>
+        {% endif %}
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
